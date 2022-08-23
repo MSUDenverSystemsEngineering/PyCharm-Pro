@@ -127,6 +127,22 @@ Try {
 		Show-InstallationProgress
 
 		## <Perform Pre-Installation tasks here>
+		If (Test-Path "$env:Public\Desktop\Data Modeler.lnk") {
+			Write-Log -Message "Deleting desktop shortcut..." -Source 'Pre-Installation' -LogType 'CMTrace'
+			Remove-Item "$env:Public\Desktop\Data Modeler.lnk" -Force
+		}
+		Else {
+			Write-Log -Message "Desktop shortcut not detected." -Source 'Pre-Installation' -LogType 'CMTrace'
+		}
+		## Delete the start menu shortcut
+		If (Test-Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Data Modeler.lnk") {
+			Write-Log -Message "Deleting start menu shortcut..." -Source 'Pre-Installation' -LogType 'CMTrace'
+			Remove-Item "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Data Modeler.lnk" -Force
+		}
+		Else {
+			Write-Log -Message "Start menu shortcut not detected." -Source 'Pre-Installation' -LogType 'CMTrace'
+		}
+		## Uninstall previous version
 		If(Test-Path -Path "$envSystemDrive\IDE\PyCharm Pro\bin\Uninstall.exe"){
 			Write-Log -Message "Attempting to run uninstaller..." -Source 'Pre-installation' -LogType 'CMTrace'
 			$exitCode = Execute-Process -Path "$envSystemDrive\IDE\PyCharm Pro\bin\Uninstall.exe" -Parameters "/S" -WindowStyle "Hidden" -PassThru
@@ -137,7 +153,7 @@ Try {
 		Else{
 			Write-Log -Message "Installation not detected" -Source 'Pre-Installation' -LogType 'CMTrace'
 		}
-
+		# Check for Python
 		If(Test-Path -Path "$envSystemDrive\Program Files\Python310\Scripts\pip.exe"){
 			Write-Log -Message "Python is already installed" -Source 'Pre-installation' -LogType 'CMTrace'
 		}
@@ -159,11 +175,17 @@ Try {
 		}
 
 		## <Perform Installation tasks here>
+		## Install application
 		Write-Log -Message "Attempting to run installer..." -Source 'Installation' -LogType 'CMTrace'
 		$exitCode = Execute-Process -Path "$dirFiles\pycharm-professional-2022.2.1.exe" -Parameters "/S /CONFIG=$dirFiles\silent.config /LOG=$envSystemDrive\Windows\Logs\Software\PyCharmPro\install.log /D=$envSystemDrive\IDE\PyCharm Pro" -WindowStyle "Hidden" -PassThru
 		If (($exitCode.ExitCode -ne "0") -and ($mainExitCode -ne "3010")) { $mainExitCode = $exitCode.ExitCode }
-
+		## Configure License
 		[Environment]::SetEnvironmentVariable("JETBRAINS_LICENSE_SERVER","http://vmwas22.winad.msudenver.edu:8081","Machine")
+		## Copy Shortcuts
+		Write-Log -Message "Copying desktop shortcut..." -Source 'Installation' -LogType 'CMTrace'
+		Copy-Item -Path "$dirFiles\Pycharm Pro.lnk" -Destination "$env:Public\Desktop"
+		Write-Log -Message "Copying start menu shortcut..." -Source 'Installation' -LogType 'CMTrace'
+		Copy-Item -Path "$dirFiles\Pycharm Pro.lnk" -Destination "$env:ProgramData\Microsoft\Windows\Start Menu\Programs"
 
 		##*===============================================
 		##* POST-INSTALLATION
@@ -223,7 +245,22 @@ Try {
 		[string]$installPhase = 'Post-Uninstallation'
 
 		## <Perform Post-Uninstallation tasks here>
-
+		## Delete the desktop shortcut
+		If (Test-Path "$env:Public\Desktop\Pycharm Pro.lnk") {
+			Write-Log -Message "Deleting desktop shortcut..." -Source 'Uninstallation' -LogType 'CMTrace'
+			Remove-Item "$env:Public\Desktop\Pycharm Pro.lnk" -Force
+		}
+		Else {
+			Write-Log -Message "Desktop shortcut not detected." -Source 'Uninstallation' -LogType 'CMTrace'
+		}
+		## Delete the start menu shortcut
+		If (Test-Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Pycharm Pro.lnk") {
+			Write-Log -Message "Deleting start menu shortcut..." -Source 'Uninstallation' -LogType 'CMTrace'
+			Remove-Item "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Pycharm Pro.lnk" -Force
+		}
+		Else {
+			Write-Log -Message "Start menu shortcut not detected." -Source 'Uninstallation' -LogType 'CMTrace'
+		}
 
 
 	}
@@ -278,8 +315,8 @@ Catch {
 # SIG # Begin signature block
 # MIIU9wYJKoZIhvcNAQcCoIIU6DCCFOQCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUCy+eJ4FB7sj6L9uMOmNOQvWC
-# AGmgghHXMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU8Jqp9qXVZPYsnm5QDCgGlJoF
+# kLagghHXMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
 # AQwFADB7MQswCQYDVQQGEwJHQjEbMBkGA1UECAwSR3JlYXRlciBNYW5jaGVzdGVy
 # MRAwDgYDVQQHDAdTYWxmb3JkMRowGAYDVQQKDBFDb21vZG8gQ0EgTGltaXRlZDEh
 # MB8GA1UEAwwYQUFBIENlcnRpZmljYXRlIFNlcnZpY2VzMB4XDTIxMDUyNTAwMDAw
@@ -379,13 +416,13 @@ Catch {
 # ZSBTaWduaW5nIENBIFIzNgIRAKVN33D73PFMVIK48rFyyjEwCQYFKw4DAhoFAKB4
 # MBgGCisGAQQBgjcCAQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQB
 # gjcCAQQwHAYKKwYBBAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkE
-# MRYEFDxb/p6LHWLa1S+47MJaTsXgMP79MA0GCSqGSIb3DQEBAQUABIIBgDrS5CGM
-# L4A1JhN10vS+7gYpNjJ933hlLdi5vhZ6Sp+r3HAu3O7vp/topT4PA3NBS4Zg2Ktx
-# Ir2wzaKr4ckubH9DubYWQ96XwiJiu6kZCrXRjWaNi0+5X5SSPkRhL6x0B0ZdhciR
-# zW1FOww8dVuBMKoFbNmPklFrrxwSFeFmemmy9i91XHNF+QhxWZIgO5gRiTx0vTch
-# AJOS96M12CiXP0MMe32r/kaK4XpIShxfLfnxclwqrN0nzczmhnhAiJDCa8RbYEpf
-# oSdPYEYSFO4u9hdoucvb1HctzsUBJbcdZYgf0DmFSmpMYXA8ICvhWzyrHPXgNP+e
-# PKdJ0z+CYlMkqf8hn6ysRxnZzjOI9/XSRleIOQ6knv/LYnPTkDeIvHg/DknHbcM/
-# ROvs3V5GtYKIEXptFkhO0Jb1nruyxHFxhuM+7+QLKfaRoXtUHZeGG3mHfhi1I3a0
-# Nb43oxRF1vRjG+yYmJWclIYdS5D4B0i1PZSzbIyaz89BzFzpolu/xluDEQ==
+# MRYEFHZZtgKeXXgf/0G2QQlyWLD/q08ZMA0GCSqGSIb3DQEBAQUABIIBgBQEsclK
+# 3DAyTa8G+GfJleq4SoHdz+rlj/0YbDd7lRboaw1GKjx0E4JjzUIgx9jRP1cKCAmh
+# asuQkBCyPU4K+tKvLzUBwSQAmk3iEEGP9UzE9zTOkRtilb3iEHcXjbcYQkm77nRT
+# GQD7kxVJEAdvHGtiIMCV+20XljIcj+svgm+8SezLiI0iaBok3PbOW0ZeBqxpnkpz
+# Tk99niuuWSDA1gqCiwAJLyb0ULbsA6Lb2GscVyhnCNTqNpIIQuK1i/mn3uGvdWrf
+# HA+ZJ9vifhnPGLzxpmXKYi+OgaJwn/cytPIrrpL+Lf8XKK0xDpyoolkesoZSjWWd
+# KychcrGXOi/EbTgWG1Wn5ZVC5sXLZTuBs5nmsqYWRYhN4Ifa0sSBTPNWdOP8LiUD
+# WCISTw6B93V6lklWjgM/yEc+I29v6rvibubyb7kMx5rwcfnsKfjhoPK6nDFK/A3T
+# f6bmBt+jV5nrR3H1twFwPCWW3YhkE2/Eo0zDxzbUwFB5w8eg7D7tioga/g==
 # SIG # End signature block
