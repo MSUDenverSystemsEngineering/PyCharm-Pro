@@ -175,12 +175,12 @@ Try {
 		}
 
 		## <Perform Installation tasks here>
+		## Configure License
+		[Environment]::SetEnvironmentVariable("JETBRAINS_LICENSE_SERVER","http://vmwas22.winad.msudenver.edu:8081","Machine")
 		## Install application
 		Write-Log -Message "Attempting to run installer..." -Source 'Installation' -LogType 'CMTrace'
 		$exitCode = Execute-Process -Path "$dirFiles\pycharm-professional-2022.2.1.exe" -Parameters "/S /CONFIG=$dirFiles\silent.config /LOG=$envSystemDrive\Windows\Logs\Software\PyCharmPro\install.log /D=$envSystemDrive\IDE\PyCharm Pro" -WindowStyle "Hidden" -PassThru
 		If (($exitCode.ExitCode -ne "0") -and ($mainExitCode -ne "3010")) { $mainExitCode = $exitCode.ExitCode }
-		## Configure License
-		[Environment]::SetEnvironmentVariable("JETBRAINS_LICENSE_SERVER","http://vmwas22.winad.msudenver.edu:8081","Machine")
 		## Copy Shortcuts
 		Write-Log -Message "Copying desktop shortcut..." -Source 'Installation' -LogType 'CMTrace'
 		Copy-Item -Path "$dirFiles\Pycharm Pro.lnk" -Destination "$env:Public\Desktop"
@@ -315,8 +315,8 @@ Catch {
 # SIG # Begin signature block
 # MIIU9wYJKoZIhvcNAQcCoIIU6DCCFOQCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU8Jqp9qXVZPYsnm5QDCgGlJoF
-# kLagghHXMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU/nXgruEsZe41U8m5F/nVqI0j
+# 1a2gghHXMIIFbzCCBFegAwIBAgIQSPyTtGBVlI02p8mKidaUFjANBgkqhkiG9w0B
 # AQwFADB7MQswCQYDVQQGEwJHQjEbMBkGA1UECAwSR3JlYXRlciBNYW5jaGVzdGVy
 # MRAwDgYDVQQHDAdTYWxmb3JkMRowGAYDVQQKDBFDb21vZG8gQ0EgTGltaXRlZDEh
 # MB8GA1UEAwwYQUFBIENlcnRpZmljYXRlIFNlcnZpY2VzMB4XDTIxMDUyNTAwMDAw
@@ -416,13 +416,13 @@ Catch {
 # ZSBTaWduaW5nIENBIFIzNgIRAKVN33D73PFMVIK48rFyyjEwCQYFKw4DAhoFAKB4
 # MBgGCisGAQQBgjcCAQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQB
 # gjcCAQQwHAYKKwYBBAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkE
-# MRYEFHZZtgKeXXgf/0G2QQlyWLD/q08ZMA0GCSqGSIb3DQEBAQUABIIBgBQEsclK
-# 3DAyTa8G+GfJleq4SoHdz+rlj/0YbDd7lRboaw1GKjx0E4JjzUIgx9jRP1cKCAmh
-# asuQkBCyPU4K+tKvLzUBwSQAmk3iEEGP9UzE9zTOkRtilb3iEHcXjbcYQkm77nRT
-# GQD7kxVJEAdvHGtiIMCV+20XljIcj+svgm+8SezLiI0iaBok3PbOW0ZeBqxpnkpz
-# Tk99niuuWSDA1gqCiwAJLyb0ULbsA6Lb2GscVyhnCNTqNpIIQuK1i/mn3uGvdWrf
-# HA+ZJ9vifhnPGLzxpmXKYi+OgaJwn/cytPIrrpL+Lf8XKK0xDpyoolkesoZSjWWd
-# KychcrGXOi/EbTgWG1Wn5ZVC5sXLZTuBs5nmsqYWRYhN4Ifa0sSBTPNWdOP8LiUD
-# WCISTw6B93V6lklWjgM/yEc+I29v6rvibubyb7kMx5rwcfnsKfjhoPK6nDFK/A3T
-# f6bmBt+jV5nrR3H1twFwPCWW3YhkE2/Eo0zDxzbUwFB5w8eg7D7tioga/g==
+# MRYEFPJi+ZdYrE+wR7WeqYY73GJmCfQJMA0GCSqGSIb3DQEBAQUABIIBgFevZ5hH
+# wxAhpKbceiM6w6CabljOciYRmv+p630atxPqy4rVQ6o5E4+/B3gJcsWAxlsM9ymb
+# LACNx6cMhLM1IPhxZI0dACYge52deFdGN8vaYa3QwJC6XqLjadIWb9k0+3QcU7Oh
+# tbhCtANRxVSHYURQL5dwdfVtuF9ZIAHGESxkj082NxTkmPOCX6BmiEycks3pNHuM
+# soMt0bq+Xp7DUFCqN1rwLHZhEhTVCQ9ZDMZlhTuNJwjGniBdOC7fiHX6nGc/MC0X
+# b4HssM0c1dP1bbUtM9fDjw2lfv3NWOj/3unV838XbEo1q2I279nCkLZFpLKoE5Gk
+# lkZUm+fU5/k8tyDHDm4DvnMxs3mUTFrFoqDo9ZKItlfo6ujzNAoNzxxzJwGFCluX
+# y4zGh7fF57twzrwm8PpcS96q5HNuuydrVql2jDnuSp8Typh5padrBVPDHcObL4a+
+# qpk7VawzELBYdYgirJbq91vWG1Kt6tR/qNOJN+ThLJghXBW8CuT/IRPDmA==
 # SIG # End signature block
